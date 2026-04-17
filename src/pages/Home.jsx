@@ -37,7 +37,9 @@ const Home = () => {
             >
               Спробувати безкоштовно
             </button>
-            <button className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+            <button 
+            onClick={() => navigate('/about')}
+            className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
               Дізнатися більше
             </button>
           </div>
