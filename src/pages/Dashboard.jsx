@@ -12,6 +12,10 @@ const Dashboard = () => {
   const [scanResult, setScanResult] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [ocrStatus, setOcrStatus] = useState("");
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const abortControllerRef = useRef(null);
+
   const preprocessImage = (file) => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -45,14 +49,22 @@ const Dashboard = () => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
+    setScanResult(null);
+    setBarcode("");
+    setImageText("");
+    setOcrStatus("");
+
+    const previewUrl = URL.createObjectURL(file);
+    setPreviewImage(previewUrl);
+
+    setIsCameraActive(false);
 
     setIsProcessing(true);
-    setOcrStatus("Обробка зображення...");
+    setOcrStatus("");
 
     try {
       const processedImage = await preprocessImage(file);
 
-      setOcrStatus("Читаю склад продукту...");
       const {
         data: { text },
       } = await Tesseract.recognize(processedImage, "ukr+eng", {
@@ -61,7 +73,6 @@ const Dashboard = () => {
       const cleanedText = text.trim().replace(/\s+/g, " ");
       setImageText(cleanedText);
 
-      setOcrStatus("Шукаю штрихкод...");
       const img = new Image();
       img.src = processedImage;
       img.onload = () => {
@@ -87,6 +98,7 @@ const Dashboard = () => {
             setOcrStatus("");
           },
         );
+        event.target.value = "";
       };
     } catch (err) {
       console.error(err);
@@ -100,15 +112,23 @@ const Dashboard = () => {
       .then((res) => res.json())
       .then((data) => setHistory(data));
   };
-  const processScannerFile = async (file) => {
-    const fakeEvent = {
-      target: {
-        files: [file],
-      },
-    };
-    await handleFileUpload(fakeEvent);
+const clearPreview = () => {
+  if (abortControllerRef.current) {
+    abortControllerRef.current.abort();
+  }
+
+    setPreviewImage(null);
+    setBarcode("");
+    setImageText("");
+    setScanResult(null);
+    setOcrStatus("");
+    setIsCameraActive(false);
+    setIsProcessing(false);
   };
-  useEffect(() => {
+
+useEffect(() => {
+    if (previewImage) return;
+
     const scanner = new Html5QrcodeScanner("reader", {
       fps: 10,
       qrbox: { width: 280, height: 280 },
@@ -121,6 +141,51 @@ const Dashboard = () => {
       },
       () => {},
     );
+
+    const localizedLabels = {
+      "Request Camera Permissions": "Надати дозвіл на камеру",
+      "Requesting camera permissions...": "Запит дозволу на камеру...",
+      "Scan an Image File": "Сканувати з файлу",
+      "Scan using camera directly": "Сканувати камерою",
+      "Choose Image - No image choosen": "Обери зображення",
+      "Stop Scanning": "Зупинити сканування",
+      "Select Camera": "Обери камеру",
+      "Or drop an image to scan": "Або перетягни файл сюди"
+    };
+
+    const translateScannerUI = () => {
+        const elements = document.querySelectorAll("#reader button, #reader span, #reader div, #reader a, #reader option, #reader label");
+        elements.forEach((el) => {
+          el.childNodes.forEach((node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              const text = node.nodeValue?.trim();
+              
+              if (!text) return;
+
+              if (localizedLabels[text]) {
+                node.nodeValue = localizedLabels[text];
+              } 
+              else if (text.startsWith("Select Camera")) {
+                node.nodeValue = text.replace("Select Camera", "Обери камеру");
+              }
+              else if (text.includes("Stop Scanning")) {
+                node.nodeValue = text.replace("Stop Scanning", "Зупинити сканування");
+              }
+            }
+          });
+        });
+      };
+
+    const translationInterval = setInterval(translateScannerUI, 100);
+
+    const checkVideoInterval = setInterval(() => {
+      const video = document.querySelector("#reader video");
+      if (video && video.readyState >= 2) {
+        setIsCameraActive(true);
+      } else {
+        setIsCameraActive(false);
+      }
+    }, 500);
 
     const interceptFileInput = () => {
       const fileInput = document.querySelector('#reader input[type="file"]');
@@ -142,20 +207,25 @@ const Dashboard = () => {
     const timer = setTimeout(interceptFileInput, 1000);
 
     return () => {
+      clearInterval(translationInterval);
+      clearInterval(checkVideoInterval);
       clearTimeout(timer);
       scanner.clear().catch((err) => console.error(err));
     };
-  }, [user]);
+  }, [user, previewImage]);
 
   const handleScan = async (code, text) => {
     if (!user?.email) return;
 
     setIsProcessing(true);
+    abortControllerRef.current = new AbortController();
+  const { signal } = abortControllerRef.current;
 
     try {
       const res = await fetch("http://localhost:5000/api/scan-product", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal,
         body: JSON.stringify({
           barcode: code || barcode,
           imageText: text || imageText,
@@ -190,13 +260,16 @@ const Dashboard = () => {
       });
 
       fetchHistory(user.email);
-    } catch (err) {
-      console.error(err);
-      alert("Помилка при аналізі продукту");
-    } finally {
-      setIsProcessing(false);
+  } catch (err) {
+    if (err.name === "AbortError") {
+      console.log("Запит було скасовано користувачем.");
+    } else {
+      console.error("Помилка при аналізі продукту:", err);
     }
-  };
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   const getStatusStyles = (status) => {
     switch (status) {
@@ -267,13 +340,30 @@ const Dashboard = () => {
               id="reader"
               className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"
             ></div>
+            {previewImage ? (
+  <div className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner flex items-center justify-center relative p-4 animate-in fade-in duration-300">
+    <img
+      src={previewImage}
+      alt="Scan Preview"
+      className="object-contain max-h-[350px] w-full rounded-2xl transition-transform hover:scale-102 duration-300"
+    />
+    <button
+      onClick={clearPreview}
+      className="absolute top-4 right-4 bg-slate-900/80 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-full backdrop-blur-sm transition-all shadow-lg"
+    >
+      ✕ Очистити фото
+    </button>
+  </div>
+) : (
+  <div id="reader" className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
+)}
 
             <div className="mb-6">
               <label className="flex items-center justify-center w-full py-4 border-2 border-dashed border-emerald-300 rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all text-emerald-700 font-bold">
                 <span className="font-bold uppercase text-xs tracking-widest">
                   {isProcessing && ocrStatus
                     ? `⏳ ${ocrStatus}`
-                    : "📁 Завантажити складне фото (AI покращення)"}
+                    : "📁 Завантажити фото"}
                 </span>
                 <input
                   type="file"
@@ -286,42 +376,40 @@ const Dashboard = () => {
 
             <canvas ref={canvasRef} className="hidden" />
 
-            <button
-              onClick={() => {
-                const video = document.querySelector("#reader video");
-                if (video) {
-                  setIsProcessing(true);
-                  setOcrStatus("Роблю фото...");
+            {(isProcessing || (isCameraActive && !previewImage)) && (
+  <button
+    onClick={() => {
+      const video = document.querySelector("#reader video");
+      if (video) {
+        setIsProcessing(true);
+        setOcrStatus("Роблю фото...");
 
-                  const canvas = document.createElement("canvas");
-                  canvas.width = video.videoWidth;
-                  canvas.height = video.videoHeight;
-                  const ctx = canvas.getContext("2d");
-                  ctx.drawImage(video, 0, 0);
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0);
 
-                  canvas.toBlob((blob) => {
-                    if (blob) {
-                      const file = new File([blob], "manual_snap.png", {
-                        type: "image/png",
-                      });
-                      handleFileUpload({ target: { files: [file] } });
-                    }
-                  });
-                } else {
-                  handleScan(barcode, imageText);
-                }
-              }}
-              disabled={isProcessing}
-              className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-3 ${
-                isProcessing
-                  ? "bg-slate-700 text-slate-300 cursor-not-allowed"
-                  : "bg-slate-900 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-slate-200"
-              }`}
-            >
-              {isProcessing
-                ? "Аналізую..."
-                : "Сфотографувати та проаналізувати"}
-            </button>
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], "manual_snap.png", {
+              type: "image/png",
+            });
+            handleFileUpload({ target: { files: [file] } });
+          }
+        });
+      }
+    }}
+    disabled={isProcessing}
+    className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest transition-all shadow-xl flex items-center justify-center gap-3 animate-in fade-in duration-300 ${
+      isProcessing
+        ? "bg-slate-700 text-slate-300 cursor-not-allowed"
+        : "bg-slate-900 text-white hover:bg-emerald-600 active:scale-[0.98] shadow-slate-200"
+    }`}
+  >
+    {isProcessing ? "Аналізую..." : "Сфотографувати та проаналізувати"}
+  </button>
+)}
           </div>
         </div>
 
