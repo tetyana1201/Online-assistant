@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const redirectPath = location.state?.from || "/dashboard";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,7 +25,7 @@ const Login = () => {
 
       if (response.ok) {
         localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/dashboard");
+        navigate(redirectPath);
       } else {
         alert(data.message || "Невірні дані для входу");
       }
