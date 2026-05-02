@@ -13,6 +13,7 @@
     "@tailwindcss/postcss": "^4.2.1",
     "@tailwindcss/vite": "^4.2.1",
     "@zxing/browser": "^0.1.5",
+    "emoji-picker-react": "^4.19.1",
     "html5-qrcode": "^2.3.8",
     "i18next": "^25.8.18",
     "quagga": "^0.12.1",

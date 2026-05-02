@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import EmojiPicker from "emoji-picker-react";
 
 const BASE_URL = "https://world.openfoodfacts.org";
 const USER_AGENT = "FoodSurveyTest/1.0-dev (tatyana.dev@gmail.com)";
@@ -8,7 +9,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-
   const [goal, setGoal] = useState("");
   const [experience, setExperience] = useState("");
   const [gender, setGender] = useState("male");
@@ -20,6 +20,13 @@ const Profile = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState([]);
   const [manualChanges, setManualChanges] = useState({});
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const onEmojiClick = (emojiData) => {
+    setReviewComment((prev) => prev + emojiData.emoji);
+  };
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("user"));
@@ -179,6 +186,41 @@ const Profile = () => {
     }
   };
 
+  const handleReviewSubmit = async () => {
+    const savedUser = JSON.parse(localStorage.getItem("user"));
+    if (!reviewComment.trim()) {
+      alert("Будь ласка, напишіть текст відгуку ✍️");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:5000/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: savedUser?.email,
+          rating: reviewRating,
+          comment: reviewComment,
+        }),
+      });
+
+      if (res.ok) {
+        alert("Дякуємо за ваш відгук! Ваша думка дуже важлива 💬✨");
+        setReviewComment("");
+        setReviewRating(5);
+        setStep(1); 
+      } else {
+        alert("Помилка при збереженні відгуку");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Не вдалося надіслати. Спробуйте пізніше.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const goals = [
     { id: "allergy", name: "Мінімізація алергії", icon: "🛡️" },
     { id: "safety", name: "Безпечні продукти", icon: "🔍" },
@@ -236,6 +278,18 @@ const Profile = () => {
               <span>{item.i}</span> {item.t}
             </button>
           ))}
+
+<button
+  onClick={() => setStep(10)}
+  className={`w-full p-4 mt-4 rounded-2xl flex items-center gap-3 font-extrabold transition-all duration-300 border border-emerald-100/50 ${
+    step === 10
+      ? "bg-emerald-600 text-white shadow-xl shadow-emerald-100 scale-[1.02]"
+      : "bg-gradient-to-r from-emerald-50/50 to-white text-emerald-600 hover:bg-emerald-50 hover:shadow-md"
+  }`}
+>
+  <span className="text-xl">✍️</span>
+  <span>Залишити відгук</span>
+</button>
 
           <button
             onClick={handleLogout}
@@ -683,14 +737,113 @@ const Profile = () => {
             </div>
           )}
 
-          <div className="mt-auto pt-8">
+{step === 10 && (
+  <div className="space-y-6 animate-in fade-in duration-500 text-left flex flex-col justify-between h-full flex-1 relative">
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-3xl font-black mb-2 text-slate-900 tracking-tight">
+          Ваш відгук про Life<span className="text-emerald-500">Scan</span>
+        </h2>
+        <p className="text-slate-400 font-bold text-[10px] uppercase tracking-[0.2em]">
+          Допоможи нам стати ще кращими
+        </p>
+      </div>
+
+      <div className="bg-[#F8FAFC] p-4 rounded-3xl border border-slate-50 flex flex-col items-center gap-3 shadow-sm">
+        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+          Твоя оцінка:
+        </span>
+        <div className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-2xl border border-slate-100/60 shadow-inner">
+          {[1, 2, 3, 4, 5].map((star) => (
             <button
-              onClick={handleFinalSave}
-              className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-xl hover:bg-emerald-600 transition-all uppercase tracking-[0.2em] italic"
+              key={star}
+              type="button"
+              onClick={() => setReviewRating(star)}
+              className="text-3xl hover:scale-110 active:scale-95 transition-transform duration-200 cursor-pointer select-none"
             >
-              Зберегти всі зміни
+              {star <= reviewRating ? "⭐" : "☆"}
             </button>
-          </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-[10px] font-black text-slate-400 ml-4 tracking-widest uppercase">
+          Твій коментар
+        </label>
+        
+        <div className="relative">
+          <textarea
+            rows="5"
+            placeholder="Опиши свої враження, ідеї або зауваження..."
+            className="w-full p-5 pr-16 bg-[#F8FAFC] border border-slate-100 rounded-[2rem] font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition-all resize-none shadow-sm placeholder:text-slate-300"
+            value={reviewComment}
+            onChange={(e) => setReviewComment(e.target.value)}
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="absolute top-4 right-4 text-xl p-2.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-100 rounded-2xl shadow-sm hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer select-none z-10 flex items-center justify-center"
+            title="Додати емодзі"
+          >
+            😃
+          </button>
+
+          {showEmojiPicker && (
+            <div className="absolute right-0 top-16 z-50 shadow-2xl rounded-2xl border border-slate-100 bg-white animate-in fade-in duration-200">
+              <div className="flex justify-end p-2 bg-slate-50 rounded-t-2xl border-b">
+                <button
+                  type="button"
+                  onClick={() => setShowEmojiPicker(false)}
+                  className="text-xs font-black text-slate-400 hover:text-slate-600 px-2 py-0.5 rounded-lg"
+                >
+                  Закрити ✕
+                </button>
+              </div>
+              <EmojiPicker 
+                onEmojiClick={onEmojiClick} 
+                width={300} 
+                height={350} 
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+
+    <div className="pt-4">
+      <button
+        onClick={handleReviewSubmit}
+        disabled={loading}
+        className={`w-full py-5 text-white font-black rounded-3xl shadow-xl hover:shadow-emerald-100 active:scale-[0.98] transition-all uppercase tracking-wider text-xs flex items-center justify-center gap-3 ${
+          loading
+            ? "bg-slate-400 cursor-not-allowed"
+            : "bg-slate-900 hover:bg-emerald-600 shadow-slate-100"
+        }`}
+      >
+        {loading ? (
+          "Надсилаю..."
+        ) : (
+          <>
+            <span className="text-base">✉️</span> Надіслати відгук
+          </>
+        )}
+      </button>
+    </div>
+  </div>
+)}
+
+          {step !== 10 && (
+            <div className="mt-auto pt-8">
+              <button
+                onClick={handleFinalSave}
+                className="w-full py-6 bg-slate-900 text-white font-black rounded-3xl shadow-xl hover:bg-emerald-600 transition-all uppercase tracking-[0.2em] italic"
+              >
+                Зберегти всі зміни
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
