@@ -56,6 +56,15 @@ const scanHistorySchema = new mongoose.Schema({
 });
 const ScanHistory = mongoose.model("ScanHistory", scanHistorySchema);
 
+const reviewSchema = new mongoose.Schema({
+  email: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  comment: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+const Review = mongoose.model("Review", reviewSchema);
+
 app.post("/api/register", async (req, res) => {
   try {
     const { email, password, profile } = req.body;
@@ -116,6 +125,41 @@ app.post("/api/update-profile", async (req, res) => {
     res.json({ message: "Успішно оновлено", user: updatedUser });
   } catch {
     res.status(500).json({ message: "Помилка оновлення профілю" });
+  }
+});
+
+app.post("/api/reviews", async (req, res) => {
+  try {
+    const { email, rating, comment } = req.body;
+
+    if (!email || !rating || !comment) {
+      return res.status(400).json({ message: "Усі поля є обов'язковими" });
+    }
+
+    const newReview = new Review({
+      email,
+      rating,
+      comment,
+    });
+
+    await newReview.save();
+
+    res.status(201).json({ 
+      success: true, 
+      message: "Відгук успішно збережено!" 
+    });
+  } catch (error) {
+    console.error("Помилка збереження відгуку:", error);
+    res.status(500).json({ message: "Помилка сервера при збереженні відгуку" });
+  }
+});
+
+app.get("/api/reviews", async (req, res) => {
+  try {
+    const reviews = await Review.find().sort({ createdAt: -1 });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ message: "Не вдалося завантажити відгуки" });
   }
 });
 
