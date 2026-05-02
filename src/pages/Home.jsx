@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/reviews");
+        const res = await fetch("https://lifescan-23ke.onrender.com/api/reviews");
         if (res.ok) {
           const data = await res.json();
           setReviews(data.slice(0, 3));

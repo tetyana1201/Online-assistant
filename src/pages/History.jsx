@@ -11,7 +11,7 @@ const History = () => {
   });
 
   const fetchHistory = (email) => {
-    fetch(`http://localhost:5000/api/history/${email}`)
+    fetch(`https://lifescan-23ke.onrender.com/api/history/${email}`)
       .then((res) => res.json())
       .then(setHistory);
   };
@@ -44,7 +44,7 @@ const History = () => {
 
   const deleteItem = async (id) => {
     if (!window.confirm("Видалити цей запис?")) return;
-    await fetch(`http://localhost:5000/api/history/delete/${id}`, {
+    await fetch(`https://lifescan-23ke.onrender.com/api/history/delete/${id}`, {
       method: "DELETE",
     });
     setHistory(history.filter((item) => item._id !== id));
@@ -52,7 +52,7 @@ const History = () => {
 
   const clearAll = async () => {
     if (!window.confirm("Видалити ВСЮ історію?")) return;
-    await fetch(`http://localhost:5000/api/history/clear/${user.email}`, {
+    await fetch(`https://lifescan-23ke.onrender.com/api/history/clear/${user.email}`, {
       method: "DELETE",
     });
     setHistory([]);

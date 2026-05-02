@@ -108,7 +108,7 @@ const Dashboard = () => {
   };
 
   const fetchHistory = (email) => {
-    fetch(`http://localhost:5000/api/history/${email}`)
+    fetch(`https://lifescan-23ke.onrender.com/api/history/${email}`)
       .then((res) => res.json())
       .then((data) => setHistory(data));
   };
@@ -222,7 +222,7 @@ useEffect(() => {
   const { signal } = abortControllerRef.current;
 
     try {
-      const res = await fetch("http://localhost:5000/api/scan-product", {
+      const res = await fetch("https://lifescan-23ke.onrender.com/api/scan-product", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         signal,

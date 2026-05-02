@@ -32,7 +32,7 @@ const AIAssistant = () => {
   }, []);
 
   const loadChatHistory = (email) => {
-    fetch(`http://localhost:5000/api/ai-chat/history/${email}`)
+    fetch(`https://lifescan-23ke.onrender.com/api/ai-chat/history/${email}`)
       .then((res) => res.json())
       .then((data) => setChatHistory(data))
       .catch((err) => console.error(err));
@@ -51,7 +51,7 @@ const AIAssistant = () => {
 
   const clearAllChats = () => {
     if (!window.confirm("Видалити всю історію чатів?")) return;
-    fetch(`http://localhost:5000/api/ai-chat/clear/${user.email}`, {
+    fetch(`https://lifescan-23ke.onrender.com/api/ai-chat/clear/${user.email}`, {
       method: "DELETE",
     })
       .then(() => {
@@ -70,7 +70,7 @@ const AIAssistant = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/api/ai-assistant/chat", {
+      const res = await fetch("https://lifescan-23ke.onrender.com/api/ai-assistant/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -87,7 +87,7 @@ const AIAssistant = () => {
       const finalMessages = [...newMessages, aiMsg];
       setMessages(finalMessages);
 
-      const saveRes = await fetch("http://localhost:5000/api/ai-chat/save", {
+      const saveRes = await fetch("https://lifescan-23ke.onrender.com/api/ai-chat/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -114,7 +114,7 @@ const AIAssistant = () => {
   const deleteChat = (id, e) => {
     e.stopPropagation();
     if (!window.confirm("Видалити?")) return;
-    fetch(`http://localhost:5000/api/ai-chat/delete/${id}`, {
+    fetch(`https://lifescan-23ke.onrender.com/api/ai-chat/delete/${id}`, {
       method: "DELETE",
     }).then(() => {
       loadChatHistory(user.email);

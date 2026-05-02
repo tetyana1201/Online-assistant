@@ -161,7 +161,7 @@ const Profile = () => {
 
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/update-profile", {
+      const response = await fetch("https://lifescan-23ke.onrender.com/api/update-profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -195,7 +195,7 @@ const Profile = () => {
 
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:5000/api/reviews", {
+      const res = await fetch("https://lifescan-23ke.onrender.com/api/reviews", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
