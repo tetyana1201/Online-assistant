@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
 import Assistant from "./pages/Assistant";
+import ReviewsList from "./pages/ReviewsList";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/history" element={<History />} />
         <Route path="/aiassistant" element={<Assistant />} />
+        <Route path="/reviews" element={<ReviewsList />} />
       </Routes>
     </Router>
   );
