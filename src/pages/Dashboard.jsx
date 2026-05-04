@@ -130,7 +130,7 @@ const clearPreview = () => {
 useEffect(() => {
     if (previewImage) return;
 
-    const scanner = new Html5QrcodeScanner("reader", {
+    const scanner = new Html5QrcodeScanner(scannerIdRef.current, {
       fps: 10,
       qrbox: { width: 280, height: 280 },
       aspectRatio: 1.0,
@@ -389,10 +389,7 @@ useEffect(() => {
               Сканувати штрихкод
             </h2>
 
-            <div
-              id="reader"
-              className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"
-            ></div>
+            <div id={scannerIdRef.current} className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
             {previewImage ? (
   <div className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner flex items-center justify-center relative p-4 animate-in fade-in duration-300">
     <img
