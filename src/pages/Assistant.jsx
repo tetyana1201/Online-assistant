@@ -14,6 +14,7 @@ const AIAssistant = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null);
   const messagesEndRef = useRef(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -41,12 +42,14 @@ const AIAssistant = () => {
   const loadChat = (chat) => {
     setCurrentChatId(chat._id);
     setMessages(chat.messages || []);
+    setIsMobileMenuOpen(false);
   };
 
   const startNewChat = () => {
     setMessages([{ role: "ai", text: "Привіт! Чим можу допомогти зараз?" }]);
     setCurrentChatId(null);
     setInput("");
+    setIsMobileMenuOpen(false);
   };
 
   const clearAllChats = () => {
@@ -152,8 +155,17 @@ const AIAssistant = () => {
           </Link>
         </div>
 
+        {isMobileMenuOpen && (
+            <div 
+              className="fixed inset-0 bg-slate-900/40 z-40 lg:hidden backdrop-blur-sm transition-all duration-300"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+          )}
+
         <div className="flex-1 flex gap-6 overflow-hidden">
-          <div className="hidden lg:flex w-80 flex-col bg-white rounded-[2rem] border border-slate-200 overflow-hidden">
+          <div className={`fixed lg:relative top-0 bottom-0 left-0 w-[290px] sm:w-80 bg-white z-50 lg:z-auto flex flex-col border-r lg:border border-slate-200 lg:rounded-[2rem] overflow-hidden transform transition-transform duration-300 ease-in-out lg:transform-none ${
+  isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+}`}>
             <div className="p-6 bg-slate-50 border-b border-slate-200">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-black uppercase tracking-tight text-lg text-slate-800">
@@ -163,6 +175,12 @@ const AIAssistant = () => {
                 <span className="bg-emerald-100 text-emerald-600 px-2 py-1 rounded-md text-[10px] font-black">
                   {chatHistory.length}
                 </span>
+                <button 
+    onClick={() => setIsMobileMenuOpen(false)}
+    className="lg:hidden text-slate-400 hover:text-rose-500 font-black text-xl px-2"
+  >
+    ✕
+  </button>
               </div>
               <button
                 onClick={startNewChat}
@@ -185,7 +203,7 @@ const AIAssistant = () => {
                     }`}
                   >
                     <p
-                      className={`text-xs font-black line-clamp-1 pr-4 ${currentChatId === chat._id ? "text-emerald-700" : "text-slate-700"}`}
+                      className={`text-xs font-black line-clamp-1 pr-6 ${currentChatId === chat._id ? "text-emerald-700" : "text-slate-700"}`}
                     >
                       {chat.title || "Нова розмова"}
                     </p>
@@ -193,11 +211,11 @@ const AIAssistant = () => {
                       {new Date(chat.createdAt).toLocaleDateString()}
                     </p>
                     <button
-                      onClick={(e) => deleteChat(chat._id, e)}
-                      className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all text-lg"
-                    >
-                      ✕
-                    </button>
+  onClick={(e) => deleteChat(chat._id, e)}
+  className="absolute right-3 top-3 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 text-slate-300 hover:text-rose-500 transition-all text-base z-10 p-1"
+>
+  ✕
+</button>
                   </div>
                 ))}
               </div>
@@ -231,6 +249,13 @@ const AIAssistant = () => {
                   </span>
                 </div>
               </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-2 rounded-xl text-xs font-bold text-white transition-all active:scale-95"
+              >
+                <span>🕒</span>
+                <span>Історія</span>
+              </button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 md:p-10 space-y-6 bg-[#F8FAFC] custom-scrollbar">
