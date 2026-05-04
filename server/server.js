@@ -5,6 +5,8 @@ const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const translate = require("@iamtraction/google-translate");
 const bcrypt = require("bcrypt");
+const BASE_URL = "https://world.openfoodfacts.org";
+const USER_AGENT = "FoodSurveyTest/1.0-dev (tatyana.dev@gmail.com)";
 
 const app = express();
 app.use(cors());
@@ -175,9 +177,11 @@ app.post("/api/scan-product", async (req, res) => {
 
     if (barcode) {
       try {
-        const offRes = await fetch(
-          `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`,
-        );
+        const offRes = await fetch(`${BASE_URL}/api/v0/product/${barcode}.json`, {
+      headers: {
+        "User-Agent": USER_AGENT,
+      },
+    });
         const offData = await offRes.json();
         if (offData.status === 1) {
           productName = offData.product.product_name || productName;
