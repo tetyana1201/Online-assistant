@@ -371,47 +371,120 @@ const Survey = () => {
             </h2>
 
             <div className="grid grid-cols-2 gap-4 text-left">
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-300 uppercase ml-4 tracking-widest">
-                  ВІК
-                </label>
+              <div className="space-y-1.5 relative">
+                <div className="flex justify-between items-center ml-4">
+                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                    ВІК (1-120)
+                  </label>
+                  {age && (parseInt(age) < 1 || parseInt(age) > 120) && (
+                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+                      Діапазон: 1-120
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
+                  min="1"
+                  max="120"
                   placeholder="Вік"
-                  className="w-full p-4 bg-emerald-50/50 rounded-[1.2rem] border-none outline-none font-black text-center text-xl text-emerald-900"
+                  className={`w-full p-4 bg-emerald-50/50 rounded-[1.2rem] border-2 outline-none font-black text-center text-xl text-emerald-900 transition-all ${
+                    age && (parseInt(age) < 1 || parseInt(age) > 120)
+                      ? "border-rose-400 bg-rose-50 text-rose-700"
+                      : "border-transparent focus:border-emerald-400"
+                  }`}
                   value={age}
-                  onChange={(e) => setAge(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || val.length <= 3) {
+                      setAge(val);
+                    }
+                  }}
                 />
               </div>
-              <div className="space-y-1.5">
-                <label className="text-[10px] font-black text-slate-300 uppercase ml-4 tracking-widest">
-                  РІСТ (СМ)
-                </label>
+
+              <div className="space-y-1.5 relative">
+                <div className="flex justify-between items-center ml-4">
+                  <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                    РІСТ (20-250 СМ)
+                  </label>
+                  {height && (parseInt(height) < 20 || parseInt(height) > 250) && (
+                    <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+                      Діапазон: 20-250 см
+                    </span>
+                  )}
+                </div>
                 <input
                   type="number"
+                  min="20"
+                  max="250"
                   placeholder="Ріст (см)"
-                  className="w-full p-4 bg-emerald-50/50 rounded-[1.2rem] border-none outline-none font-black text-center text-xl text-emerald-900"
+                  className={`w-full p-4 bg-emerald-50/50 rounded-[1.2rem] border-2 outline-none font-black text-center text-xl text-emerald-900 transition-all ${
+                    height && (parseInt(height) < 20 || parseInt(height) > 250)
+                      ? "border-rose-400 bg-rose-50 text-rose-700"
+                      : "border-transparent focus:border-emerald-400"
+                  }`}
                   value={height}
-                  onChange={(e) => setHeight(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || val.length <= 3) {
+                      setHeight(val);
+                    }
+                  }}
                 />
               </div>
             </div>
 
-            <div className="space-y-1.5 text-left">
-              <label className="text-[10px] font-black text-slate-300 uppercase ml-4 tracking-widest">
-                ВАША ВАГА (КГ)
-              </label>
+            <div className="space-y-1.5 text-left relative">
+              <div className="flex justify-between items-center ml-4">
+                <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+                  ВАША ВАГА (2-300 КГ)
+                </label>
+                {weight && (parseInt(weight) < 2 || parseInt(weight) > 300) && (
+                  <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+                    Діапазон: 2-300 кг
+                  </span>
+                )}
+              </div>
               <input
                 type="number"
+                min="2"
+                max="300"
                 placeholder="Вага (кг)"
-                className="w-full p-4 bg-[#f0f9f6] rounded-[1.5rem] border-2 border-emerald-400 outline-none font-black text-center text-4xl text-emerald-900 transition-all"
+                className={`w-full p-4 rounded-[1.5rem] outline-none font-black text-center text-4xl transition-all border-2 ${
+                  weight && (parseInt(weight) < 2 || parseInt(weight) > 300)
+                    ? "border-rose-500 bg-rose-50 text-rose-900"
+                    : "border-emerald-400 bg-[#f0f9f6] text-emerald-900 focus:border-emerald-600"
+                }`}
                 value={weight}
-                onChange={(e) => setWeight(e.target.value)}
+                onKeyDown={(e) => {
+                  if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === "" || val.length <= 3) {
+                    setWeight(val);
+                  }
+                }}
               />
             </div>
 
-            {weight && height && (
-              <div className="flex flex-col items-center pt-2">
+            {age && height && weight &&
+            parseInt(age) >= 1 && parseInt(age) <= 120 &&
+            parseInt(height) >= 20 && parseInt(height) <= 250 &&
+            parseInt(weight) >= 2 && parseInt(weight) <= 300 ? (
+              <div className="flex flex-col items-center pt-2 animate-in fade-in duration-300">
                 <svg
                   width="280"
                   height="140"
@@ -442,22 +515,10 @@ const Survey = () => {
                     strokeWidth="42"
                   />
 
-                  <text
-                    x="67"
-                    y="7"
-                    fontSize="11"
-                    fill="#64748b"
-                    fontWeight="black"
-                  >
+                  <text x="67" y="7" fontSize="11" fill="#64748b" fontWeight="black">
                     18.5
                   </text>
-                  <text
-                    x="155"
-                    y="7"
-                    fontSize="11"
-                    fill="#64748b"
-                    fontWeight="black"
-                  >
+                  <text x="155" y="7" fontSize="11" fill="#64748b" fontWeight="black">
                     24.9
                   </text>
 
@@ -527,19 +588,24 @@ const Survey = () => {
                   )}
                 </div>
               </div>
-            )}
+            ) : null}
 
             <div className="flex gap-4 pt-4">
               <button
                 onClick={() => setStep(4)}
-                className="flex-1 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl uppercase text-xs hover:bg-slate-100"
+                className="flex-1 py-5 bg-slate-50 text-slate-400 font-bold rounded-2xl uppercase text-xs hover:bg-slate-100 transition-colors"
               >
                 Назад
               </button>
               <button
-                disabled={!weight || !height || !age}
+                disabled={
+                  !age || !height || !weight ||
+                  parseInt(age) < 1 || parseInt(age) > 120 ||
+                  parseInt(height) < 20 || parseInt(height) > 250 ||
+                  parseInt(weight) < 2 || parseInt(weight) > 300
+                }
                 onClick={() => setStep(6)}
-                className="flex-[2] py-5 bg-[#0f172a] text-white font-bold rounded-2xl shadow-xl transition-all text-lg"
+                className="flex-[2] py-5 bg-[#0f172a] text-white font-bold rounded-2xl shadow-xl transition-all text-lg disabled:opacity-20 disabled:cursor-not-allowed"
               >
                 Далі
               </button>
