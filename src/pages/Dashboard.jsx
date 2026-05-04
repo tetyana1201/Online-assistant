@@ -622,16 +622,29 @@ useEffect(() => {
       )}
 
       {ing.reason && activeTooltip === idx && (
-        <div className="block md:hidden absolute top-full mt-2 z-[200] left-1/2 -translate-x-1/2 w-max max-w-[280px] p-4 bg-slate-900 text-white text-[13px] font-medium rounded-2xl shadow-2xl leading-relaxed">
-          <p className="text-emerald-400 mb-2 uppercase text-[10px] tracking-widest font-black">
-            Обґрунтування:
-          </p>
-          <div className="whitespace-normal break-words">
-            {ing.reason}
-          </div>
-          <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900"></div>
-        </div>
-      )}
+  <div className="block md:hidden absolute top-full mt-2 z-[200] left-1/2 -translate-x-1/2 w-[260px] p-4 bg-slate-900 text-white text-[13px] font-medium rounded-2xl shadow-2xl leading-relaxed animate-in fade-in zoom-in-95 duration-200">
+    
+    <button
+      onClick={(e) => {
+        e.stopPropagation(); 
+        setActiveTooltip(null);
+      }}
+      className="absolute top-3 right-3 text-slate-400 hover:text-white text-base leading-none p-1 transition-colors cursor-pointer select-none"
+    >
+      ✕
+    </button>
+
+    <p className="text-emerald-400 mb-2 uppercase text-[10px] tracking-widest font-black pr-6">
+      Обґрунтування:
+    </p>
+    
+    <div className="whitespace-normal break-words pr-2 text-slate-200">
+      {ing.reason}
+    </div>
+    
+    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900"></div>
+  </div>
+)}
     </div>
   ))}
                   </div>
