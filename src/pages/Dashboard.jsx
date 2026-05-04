@@ -15,6 +15,7 @@ const Dashboard = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const abortControllerRef = useRef(null);
+const scannerIdRef = useRef(`scanner-${Math.random().toString(36).substr(2, 9)}`); // Унікальний ID при кожному рендері
 
   const preprocessImage = (file) => {
     return new Promise((resolve) => {
@@ -133,6 +134,7 @@ useEffect(() => {
       fps: 10,
       qrbox: { width: 280, height: 280 },
       aspectRatio: 1.0,
+      rememberLastUsedCamera: false,
     });
 
     scanner.render(
@@ -155,7 +157,7 @@ useEffect(() => {
     };
 
     const translateScannerUI = () => {
-        const elements = document.querySelectorAll("#reader button, #reader span, #reader div, #reader a, #reader option, #reader label");
+        const elements = document.querySelectorAll(`#${scannerIdRef.current} button, #${scannerIdRef.current} span, #${scannerIdRef.current} div, #${scannerIdRef.current} a, #${scannerIdRef.current} option, #${scannerIdRef.current} label`);
         elements.forEach((el) => {
           el.childNodes.forEach((node) => {
             if (node.nodeType === Node.TEXT_NODE) {
@@ -183,7 +185,7 @@ useEffect(() => {
     const translationInterval = setInterval(translateScannerUI, 100);
 
     const checkVideoInterval = setInterval(() => {
-      const video = document.querySelector("#reader video");
+      const video = document.querySelector(`#${scannerIdRef.current} video`);
       if (video && video.readyState >= 2) {
         setIsCameraActive(true);
       } else {
@@ -192,7 +194,7 @@ useEffect(() => {
     }, 500);
 
     const interceptFileInput = () => {
-    const fileInput = document.querySelector('#reader input[type="file"]');
+    const fileInput = document.querySelector(`#${scannerIdRef.current} input[type="file"]`);
     if (fileInput) {
       const newFileInput = fileInput.cloneNode(true);
       fileInput.parentNode.replaceChild(newFileInput, fileInput);
@@ -406,7 +408,7 @@ useEffect(() => {
     </button>
   </div>
 ) : (
-  <div id="reader" className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
+  <div id={scannerIdRef.current} className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
 )}
 
             <div className="mb-6">
