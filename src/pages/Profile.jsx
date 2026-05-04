@@ -397,156 +397,230 @@ const Profile = () => {
           )}
 
           {step === 5 && (
-            <div className="space-y-8 animate-in fade-in duration-500 text-center">
-              <h2 className="text-3xl font-black">Параметри тіла</h2>
-              <div className="grid grid-cols-2 gap-4 text-left">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-300 ml-4 tracking-widest uppercase">
-                    ВІК
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full p-5 bg-slate-50 rounded-2xl font-black text-xl text-center outline-none focus:ring-2 focus:ring-emerald-500"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-300 ml-4 tracking-widest uppercase">
-                    РІСТ (СМ)
-                  </label>
-                  <input
-                    type="number"
-                    className="w-full p-5 bg-slate-50 rounded-2xl font-black text-xl text-center outline-none focus:ring-2 focus:ring-emerald-500"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2 text-left">
-                <label className="text-[10px] font-black text-slate-300 ml-4 uppercase tracking-widest">
-                  Ваша вага (кг)
-                </label>
-                <input
-                  type="number"
-                  className="w-full p-6 bg-emerald-50 border-2 border-emerald-500 rounded-3xl font-black text-4xl text-center text-emerald-900 outline-none"
-                  value={weight}
-                  onChange={(e) => setWeight(e.target.value)}
-                />
-              </div>
+  <div className="space-y-8 animate-in fade-in duration-500 text-center">
+    <h2 className="text-3xl font-black">Параметри тіла</h2>
 
-              {bmiValue && (
-                <div className="pt-6 flex flex-col items-center">
-                  <svg
-                    width="280"
-                    height="140"
-                    viewBox="0 0 240 130"
-                    className="overflow-visible font-black"
-                  >
-                    <defs>
-                      <path id="pB" d="M 35 115 A 85 85 0 0 1 70 55" />
-                      <path id="pP" d="M 170 55 A 85 85 0 0 1 205 115" />
-                    </defs>
-                    <path
-                      d="M 30 120 A 90 90 0 0 1 77 45"
-                      fill="none"
-                      stroke="#93c5fd"
-                      strokeWidth="42"
-                    />
-                    <path
-                      d="M 77 45 A 90 90 0 0 1 163 45"
-                      fill="none"
-                      stroke="#99f6e4"
-                      strokeWidth="42"
-                    />
-                    <path
-                      d="M 163 45 A 90 90 0 0 1 210 120"
-                      fill="none"
-                      stroke="#f472b6"
-                      strokeWidth="42"
-                    />
-                    <text
-                      x="67"
-                      y="7"
-                      fontSize="11"
-                      fill="#64748b"
-                      fontWeight="black"
-                    >
-                      18.5
-                    </text>
-                    <text
-                      x="155"
-                      y="7"
-                      fontSize="11"
-                      fill="#64748b"
-                      fontWeight="black"
-                    >
-                      24.9
-                    </text>
-                    <text
-                      x="120"
-                      y="39"
-                      fontSize="8"
-                      fill="#0f766e"
-                      textAnchor="middle"
-                      fontWeight="black"
-                    >
-                      НОРМАЛЬНО
-                    </text>
-                    <text fontSize="7" fontWeight="900">
-                      <textPath
-                        href="#pB"
-                        startOffset="50%"
-                        textAnchor="middle"
-                        fill="#1e40af"
-                      >
-                        НИЖЧЕ НОРМИ
-                      </textPath>
-                      <textPath
-                        href="#pP"
-                        startOffset="50%"
-                        textAnchor="middle"
-                        fill="#9d174d"
-                      >
-                        ВИЩЕ НОРМИ
-                      </textPath>
-                    </text>
-                    <g
-                      style={{
-                        transform: `rotate(${getRotation(bmiValue)}deg)`,
-                        transformOrigin: "120px 120px",
-                        transition: "all 1.5s ease",
-                      }}
-                    >
-                      <line
-                        x1="120"
-                        y1="120"
-                        x2="120"
-                        y2="40"
-                        stroke="#1e293b"
-                        strokeWidth="5"
-                        strokeLinecap="round"
-                      />
-                      <circle cx="120" cy="120" r="8" fill="#1e293b" />
-                    </g>
-                  </svg>
-                  <p
-                    className="text-3xl font-black mt-2 transition-all"
-                    style={{ color: getBMIColor(bmiValue) }}
-                  >
-                    IMT: {bmiValue}
-                  </p>
-                  {calculateBMR() && (
-                    <div className="bg-[#f0f9f6] px-5 py-1.5 rounded-full inline-block">
-                      <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">
-                        Метаболізм: {calculateBMR()} ккал
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
+    <div className="grid grid-cols-2 gap-4 text-left">
+      <div className="space-y-1.5 relative">
+        <div className="flex justify-between items-center ml-4">
+          <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+            ВІК (1-120)
+          </label>
+          {age && (parseInt(age) < 1 || parseInt(age) > 120) && (
+            <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+              Діапазон: 1-120
+            </span>
+          )}
+        </div>
+        <input
+          type="number"
+          min="1"
+          max="120"
+          placeholder="Вік"
+          className={`w-full p-5 bg-slate-50 rounded-2xl font-black text-xl text-center outline-none border-2 transition-all ${
+            age && (parseInt(age) < 1 || parseInt(age) > 120)
+              ? "border-rose-400 bg-rose-50 text-rose-700"
+              : "border-transparent focus:border-emerald-400 focus:bg-white"
+          }`}
+          value={age}
+          onKeyDown={(e) => {
+            if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "" || val.length <= 3) {
+              setAge(val);
+            }
+          }}
+        />
+      </div>
+
+      <div className="space-y-1.5 relative">
+        <div className="flex justify-between items-center ml-4">
+          <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+            РІСТ (20-250 СМ)
+          </label>
+          {height && (parseInt(height) < 20 || parseInt(height) > 250) && (
+            <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+              Діапазон: 20-250 см
+            </span>
+          )}
+        </div>
+        <input
+          type="number"
+          min="20"
+          max="250"
+          placeholder="Ріст (см)"
+          className={`w-full p-5 bg-slate-50 rounded-2xl font-black text-xl text-center outline-none border-2 transition-all ${
+            height && (parseInt(height) < 20 || parseInt(height) > 250)
+              ? "border-rose-400 bg-rose-50 text-rose-700"
+              : "border-transparent focus:border-emerald-400 focus:bg-white"
+          }`}
+          value={height}
+          onKeyDown={(e) => {
+            if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (val === "" || val.length <= 3) {
+              setHeight(val);
+            }
+          }}
+        />
+      </div>
+    </div>
+
+    <div className="space-y-1.5 text-left relative">
+      <div className="flex justify-between items-center ml-4">
+        <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest">
+          ВАША ВАГА (2-300 КГ)
+        </label>
+        {weight && (parseInt(weight) < 2 || parseInt(weight) > 300) && (
+          <span className="text-[10px] font-black text-rose-500 uppercase tracking-tight animate-pulse">
+            Діапазон: 2-300 кг
+          </span>
+        )}
+      </div>
+      <input
+        type="number"
+        min="2"
+        max="300"
+        placeholder="Вага (кг)"
+        className={`w-full p-6 rounded-3xl outline-none font-black text-center text-4xl border-2 transition-all ${
+          weight && (parseInt(weight) < 2 || parseInt(weight) > 300)
+            ? "border-rose-500 bg-rose-50 text-rose-900"
+            : "border-emerald-400 bg-emerald-50/50 text-emerald-900 focus:border-emerald-600 focus:bg-white"
+        }`}
+        value={weight}
+        onKeyDown={(e) => {
+          if (["-", ".", ",", "+", "e", "E"].includes(e.key)) {
+            e.preventDefault();
+          }
+        }}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (val === "" || val.length <= 3) {
+            setWeight(val);
+          }
+        }}
+      />
+    </div>
+
+    {age && height && weight &&
+    parseInt(age) >= 1 && parseInt(age) <= 120 &&
+    parseInt(height) >= 20 && parseInt(height) <= 250 &&
+    parseInt(weight) >= 2 && parseInt(weight) <= 300 ? (
+      <div className="pt-6 flex flex-col items-center animate-in fade-in duration-300">
+        <svg
+          width="280"
+          height="140"
+          viewBox="0 0 240 130"
+          className="overflow-visible font-black"
+        >
+          <defs>
+            <path id="pB" d="M 35 115 A 85 85 0 0 1 70 55" />
+            <path id="pP" d="M 170 55 A 85 85 0 0 1 205 115" />
+          </defs>
+
+          <path
+            d="M 30 120 A 90 90 0 0 1 77 45"
+            fill="none"
+            stroke="#93c5fd"
+            strokeWidth="42"
+          />
+          <path
+            d="M 77 45 A 90 90 0 0 1 163 45"
+            fill="none"
+            stroke="#99f6e4"
+            strokeWidth="42"
+          />
+          <path
+            d="M 163 45 A 90 90 0 0 1 210 120"
+            fill="none"
+            stroke="#f472b6"
+            strokeWidth="42"
+          />
+
+          <text x="67" y="7" fontSize="11" fill="#64748b" fontWeight="black">
+            18.5
+          </text>
+          <text x="155" y="7" fontSize="11" fill="#64748b" fontWeight="black">
+            24.9
+          </text>
+
+          <text
+            x="120"
+            y="39"
+            fontSize="8"
+            fill="#0f766e"
+            textAnchor="middle"
+            fontWeight="black"
+          >
+            НОРМАЛЬНО
+          </text>
+
+          <text fontSize="7" fontWeight="900">
+            <textPath
+              href="#pB"
+              startOffset="50%"
+              textAnchor="middle"
+              fill="#1e40af"
+            >
+              НИЖЧЕ НОРМИ
+            </textPath>
+            <textPath
+              href="#pP"
+              startOffset="50%"
+              textAnchor="middle"
+              fill="#9d174d"
+            >
+              ВИЩЕ НОРМИ
+            </textPath>
+          </text>
+
+          <g
+            style={{
+              transform: `rotate(${getRotation(bmiValue)}deg)`,
+              transformOrigin: "120px 120px",
+              transition: "all 1.5s ease",
+            }}
+          >
+            <line
+              x1="120"
+              y1="120"
+              x2="120"
+              y2="40"
+              stroke="#1e293b"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+            <circle cx="120" cy="120" r="8" fill="#1e293b" />
+          </g>
+        </svg>
+
+        <div className="mt-2 text-center space-y-2">
+          <p
+            className="text-3xl font-black leading-none tracking-tight transition-all"
+            style={{ color: getBMIColor(bmiValue) }}
+          >
+            IMT: {bmiValue}
+          </p>
+          {calculateBMR() && (
+            <div className="bg-[#f0f9f6] px-5 py-1.5 rounded-full inline-block">
+              <p className="text-[8px] font-black text-emerald-600 uppercase tracking-widest">
+                Метаболізм: {calculateBMR()} ккал
+              </p>
             </div>
           )}
+        </div>
+      </div>
+    ) : null}
+  </div>
+)}
 
           {step === 6 && (
             <div className="space-y-6 animate-in fade-in duration-500 text-left">
