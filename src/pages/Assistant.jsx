@@ -293,7 +293,7 @@ const AIAssistant = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === "Enter" && sendMessage()}
                   placeholder="Запитайте про склад, калорії або поради..."
-                  className="w-full bg-slate-100 border-2 border-slate-200 rounded-[2rem] px-8 py-5 pr-20 text-slate-900 text-xs md:text-base font-bold focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner"
+                  className="w-full bg-slate-100 border-2 border-slate-200 rounded-[2rem] px-8 py-5 pr-20 text-slate-900 text-[10px] md:text-base font-bold focus:outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner"
                 />
                 <button
                   onClick={sendMessage}
