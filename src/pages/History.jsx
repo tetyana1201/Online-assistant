@@ -156,7 +156,7 @@ useEffect(() => {
                         item.verdict === "avoid"
                           ? "bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.4)]"
                           : item.verdict === "limit"
-                            ? "bg-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.4)]"
+                            ? "bg-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.4)]"
                             : "bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]"
                       }`}
                     />
