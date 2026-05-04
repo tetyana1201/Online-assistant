@@ -185,14 +185,14 @@ useEffect(() => {
 
         {selectedScan && (
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-            <div className="bg-white w-full max-w-3xl max-h-[90vh] rounded-[3.5rem] shadow-2xl relative flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className="p-10 pb-6 border-b border-slate-50 shrink-0">
-                <button
-                  onClick={() => setSelectedScan(null)}
-                  className="absolute top-8 right-8 w-12 h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all text-3xl z-10"
-                >
-                  ×
-                </button>
+            <div className="bg-white w-full max-w-3xl max-h-[85vh] md:max-h-[90vh] rounded-[2rem] md:rounded-[3.5rem] shadow-2xl relative flex flex-col overflow-hidden animate-in zoom-in-95 duration-300">
+              <div className="p-5 md:p-10 pb-4 md:pb-6 border-b border-slate-50 shrink-0 relative">
+  <button
+    onClick={() => setSelectedScan(null)}
+    className="absolute top-4 right-4 md:top-8 md:right-8 w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-slate-900 transition-all text-2xl md:text-3xl z-10"
+  >
+    ×
+  </button>
 
                 <span
                   className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.2em] mb-4 inline-block ${
@@ -218,13 +218,13 @@ useEffect(() => {
                 </p>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-10 pt-6 custom-scrollbar">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {selectedScan.ingredients?.map((ing, i) => (
-                    <div
-                      key={i}
-                      className={`p-6 rounded-[2rem] border-2 transition-all hover:scale-[1.02] ${getStatusStyles(ing.status)}`}
-                    >
+              <div className="flex-1 overflow-y-auto p-4 md:p-10 pt-2 md:pt-6 custom-scrollbar">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+    {selectedScan.ingredients?.map((ing, i) => (
+      <div
+        key={i}
+        className={`p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border-2 transition-all hover:scale-[1.02] ${getStatusStyles(ing.status)}`}
+      >
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xs">
                           {ing.status === "avoid"
