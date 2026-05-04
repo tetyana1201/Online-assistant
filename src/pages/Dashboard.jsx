@@ -15,7 +15,8 @@ const Dashboard = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const abortControllerRef = useRef(null);
-const scannerIdRef = useRef(`scanner-${Math.random().toString(36).substr(2, 9)}`); // Унікальний ID при кожному рендері
+const scannerIdRef = useRef(`scanner-${Math.random().toString(36).substr(2, 9)}`); 
+const [activeTooltip, setActiveTooltip] = useState(null);
 
   const preprocessImage = (file) => {
     return new Promise((resolve) => {
@@ -597,29 +598,42 @@ useEffect(() => {
                   </h3>
                   <div className="flex flex-wrap gap-4 text-left">
                     {scanResult.ingredients?.map((ing, idx) => (
-                      <div key={idx} className="group relative">
-                        <button
-                          className={`px-6 py-3 rounded-[1.2rem] border-2 font-black text-xs uppercase transition-all hover:scale-105 active:scale-95 ${getStatusStyles(ing.status)}`}
-                        >
-                          {ing.name
-                            .replace(/^RU:/i, "")
-                            .toLowerCase()
-                            .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
-                        </button>
-                        {ing.reason && (
-                          <div className="absolute bottom-full mb-2 z-[100] left-0 w-max max-w-[250px] p-3 bg-slate-900 text-white text-[11px] font-bold rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-all duration-300 shadow-2xl translate-y-2 group-hover:translate-y-0 leading-relaxed">
-                            <p className="text-emerald-400 mb-1 uppercase text-[9px] tracking-widest font-black">
-                              Обґрунтування:
-                            </p>
-                            <div className="whitespace-normal break-words">
-                              {ing.reason}
-                            </div>
+    <div key={idx} className="group relative">
+      <button
+        onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
+        className={`px-6 py-3 rounded-[1.2rem] border-2 font-black text-xs uppercase transition-all hover:scale-105 active:scale-95 ${getStatusStyles(ing.status)}`}
+      >
+        {ing.name
+          .replace(/^RU:/i, "")
+          .toLowerCase()
+          .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+      </button>
 
-                            <div className="absolute top-full left-4 border-8 border-transparent border-t-slate-900"></div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
+      {ing.reason && (
+        <div className="hidden group-hover:block absolute bottom-full mb-2 z-[100] left-1/2 -translate-x-1/2 w-max max-w-[260px] p-3 bg-slate-900 text-white text-[11px] font-bold rounded-xl shadow-2xl leading-relaxed pointer-events-none">
+          <p className="text-emerald-400 mb-1 uppercase text-[9px] tracking-widest font-black">
+            Обґрунтування:
+          </p>
+          <div className="whitespace-normal break-words">
+            {ing.reason}
+          </div>
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+        </div>
+      )}
+
+      {ing.reason && activeTooltip === idx && (
+        <div className="block md:hidden absolute top-full mt-2 z-[200] left-1/2 -translate-x-1/2 w-max max-w-[280px] p-4 bg-slate-900 text-white text-[13px] font-medium rounded-2xl shadow-2xl leading-relaxed">
+          <p className="text-emerald-400 mb-2 uppercase text-[10px] tracking-widest font-black">
+            Обґрунтування:
+          </p>
+          <div className="whitespace-normal break-words">
+            {ing.reason}
+          </div>
+          <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900"></div>
+        </div>
+      )}
+    </div>
+  ))}
                   </div>
                 </div>
               </div>
