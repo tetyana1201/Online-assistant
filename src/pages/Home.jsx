@@ -93,11 +93,11 @@ const Home = () => {
                   Спробувати безкоштовно
                 </button>
                 <button
-                  onClick={scrollToReviews}
-                  className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all text-center shadow-sm cursor-pointer select-none"
-                >
-                  Дізнатися більше
-                </button>
+  onClick={() => navigate("/about")}
+  className="px-8 py-4 bg-white text-slate-900 font-bold rounded-2xl border border-slate-200 hover:bg-slate-50 transition-all text-center shadow-sm cursor-pointer select-none"
+>
+  Дізнатися більше
+</button>
               </div>
             </div>
 
