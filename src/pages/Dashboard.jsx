@@ -149,6 +149,7 @@ useEffect(() => {
       "Scan using camera directly": "Сканувати камерою",
       "Choose Image - No image choosen": "Обери зображення",
       "Stop Scanning": "Зупинити сканування",
+      "Start Scanning": "Почати сканування",
       "Select Camera": "Обери камеру",
       "Or drop an image to scan": "Або перетягни файл сюди"
     };
@@ -171,6 +172,9 @@ useEffect(() => {
               else if (text.includes("Stop Scanning")) {
                 node.nodeValue = text.replace("Stop Scanning", "Зупинити сканування");
               }
+              else if (text.includes("Start Scanning")) { 
+                node.nodeValue = text.replace("Start Scanning", "Почати сканування");
+              }
             }
           });
         });
@@ -188,31 +192,36 @@ useEffect(() => {
     }, 500);
 
     const interceptFileInput = () => {
-      const fileInput = document.querySelector('#reader input[type="file"]');
-      if (fileInput) {
-        fileInput.addEventListener(
-          "change",
-          (e) => {
-            if (e.target.files && e.target.files.length > 0) {
-              e.stopImmediatePropagation();
-              const fakeEvent = { target: { files: [e.target.files[0]] } };
-              handleFileUpload(fakeEvent);
+    const fileInput = document.querySelector('#reader input[type="file"]');
+    if (fileInput) {
+      const newFileInput = fileInput.cloneNode(true);
+      fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+      newFileInput.addEventListener("change", (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+          console.log("Файл обрано через внутрішню кнопку сканера");
+          
+          const fakeEvent = {
+            target: {
+              files: [e.target.files[0]],
+              value: ""
             }
-          },
-          true,
-        );
-      }
-    };
+          };
+          handleFileUpload(fakeEvent);
+        }
+      });
+    }
+  };
 
-    const timer = setTimeout(interceptFileInput, 1000);
+  const interceptInterval = setInterval(interceptFileInput, 500);
 
-    return () => {
-      clearInterval(translationInterval);
-      clearInterval(checkVideoInterval);
-      clearTimeout(timer);
-      scanner.clear().catch((err) => console.error(err));
-    };
-  }, [user, previewImage]);
+  return () => {
+    clearInterval(translationInterval);
+    clearInterval(checkVideoInterval);
+    clearInterval(interceptInterval); 
+    scanner.clear().catch((err) => console.error(err));
+  };
+}, [user, previewImage]);
 
   const handleScan = async (code, text) => {
   if (!user?.email) return;
