@@ -68,8 +68,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-12 font-sans selection:bg-emerald-100">
-      <div className="max-w-6xl mx-auto flex flex-col items-center">
+    <div className="min-h-screen w-full bg-[#F8FAFC] font-sans selection:bg-emerald-100 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto flex flex-col items-center p-4 md:p-12 w-full">
         <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
           <div>
             <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">
