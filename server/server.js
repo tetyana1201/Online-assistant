@@ -167,7 +167,7 @@ app.get("/api/reviews", async (req, res) => {
 
 app.post("/api/scan-product", async (req, res) => {
   try {
-    const { barcode, imageText, email } = req.body;
+    const { barcode, imageText, email, offData } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -175,25 +175,30 @@ app.post("/api/scan-product", async (req, res) => {
     let rawIngredients = [];
     let calories = 0;
 
-    if (barcode) {
+    if (offData && offData.rawIngredients && offData.rawIngredients.length > 0) {
+      productName = offData.productName || productName;
+      rawIngredients = offData.rawIngredients;
+      calories = offData.calories || 0;
+      console.log(`Використовуємо дані OFF, надіслані з фронтенду для: ${productName}`);
+    } 
+
+    else if (barcode) {
       try {
         const offRes = await fetch(`${BASE_URL}/api/v0/product/${barcode}.json`, {
-      headers: {
-        "User-Agent": USER_AGENT,
-      },
-    });
-        const offData = await offRes.json();
-        if (offData.status === 1) {
-          productName = offData.product.product_name || productName;
+          headers: { "User-Agent": USER_AGENT },
+        });
+        const fetchedData = await offRes.json();
+        if (fetchedData.status === 1) {
+          productName = fetchedData.product.product_name || productName;
           rawIngredients =
-            offData.product.ingredients_tags?.map((t) =>
-              t.replace("en:", "").replace(/-/g, " "),
+            fetchedData.product.ingredients_tags?.map((t) =>
+              t.replace("en:", "").replace(/-/g, " ")
             ) ||
-            offData.product.ingredients_text?.split(",").map((i) => i.trim()) ||
+            fetchedData.product.ingredients_text?.split(",").map((i) => i.trim()) ||
             [];
-          calories = offData.product.nutriments?.["energy-kcal_100g"] || 0;
+          calories = fetchedData.product.nutriments?.["energy-kcal_100g"] || 0;
         }
-      } catch {
+      } catch (err) {
         console.log("OFF недоступний");
       }
     }

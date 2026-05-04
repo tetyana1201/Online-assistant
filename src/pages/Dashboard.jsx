@@ -215,51 +215,93 @@ useEffect(() => {
   }, [user, previewImage]);
 
   const handleScan = async (code, text) => {
-    if (!user?.email) return;
+  if (!user?.email) return;
 
-    setIsProcessing(true);
-    abortControllerRef.current = new AbortController();
+  setIsProcessing(true);
+  abortControllerRef.current = new AbortController();
   const { signal } = abortControllerRef.current;
 
+  let productName = "Невідомий продукт";
+  let rawIngredients = [];
+  let calories = 0;
+  let fetchedFromOFF = false;
+
+  const currentBarcode = code || barcode;
+
+  if (currentBarcode) {
     try {
-      const res = await fetch("https://lifescan-23ke.onrender.com/api/scan-product", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal,
-        body: JSON.stringify({
-          barcode: code || barcode,
-          imageText: text || imageText,
-          email: user.email,
-        }),
-      });
+      const offRes = await fetch(
+        `https://world.openfoodfacts.org/api/v0/product/${currentBarcode}.json`,
+        {
+          headers: {
+            "User-Agent": "FoodSurveyTest/1.0-dev (tatyana.dev@gmail.com)",
+            "Accept": "application/json"
+          },
+          signal
+        }
+      );
 
-      const data = await res.json();
-      const currentBarcode = code || barcode;
-
-      const manualEntry = user?.profile?.manualChanges?.[currentBarcode];
-      const manualStatus =
-        manualEntry && typeof manualEntry === "object"
-          ? manualEntry.status
-          : manualEntry;
-
-      let finalVerdict = data.verdict;
-
-      if (data.verdict !== "avoid") {
-        if (manualStatus && manualStatus !== "allow") {
-          finalVerdict = manualStatus;
+      if (offRes.ok) {
+        const offData = await offRes.json();
+        if (offData.status === 1) {
+          productName = offData.product.product_name || productName;
+          rawIngredients =
+            offData.product.ingredients_tags?.map((t) =>
+              t.replace("en:", "").replace(/-/g, " ")
+            ) ||
+            offData.product.ingredients_text?.split(",").map((i) => i.trim()) ||
+            [];
+          calories = offData.product.nutriments?.["energy-kcal_100g"] || 0;
+          fetchedFromOFF = true;
+          console.log("Успішно отримано з OFF на фронтенді");
         }
       }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Помилка запиту до OFF на фронтенді:", err);
+      }
+    }
+  }
 
-      setScanResult({
-        ...data,
-        verdict: finalVerdict,
+  try {
+    const res = await fetch("https://lifescan-23ke.onrender.com/api/scan-product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal,
+      body: JSON.stringify({
         barcode: currentBarcode,
-        productName: data.productName
-          ? data.productName.replace(/&quot;/g, '"')
-          : data.productName,
-      });
+        imageText: text || imageText,
+        email: user.email,
+        offData: fetchedFromOFF ? { productName, rawIngredients, calories } : null
+      }),
+    });
 
-      fetchHistory(user.email);
+    const data = await res.json();
+
+    const manualEntry = user?.profile?.manualChanges?.[currentBarcode];
+    const manualStatus =
+      manualEntry && typeof manualEntry === "object"
+        ? manualEntry.status
+        : manualEntry;
+
+    let finalVerdict = data.verdict;
+
+    if (data.verdict !== "avoid") {
+      if (manualStatus && manualStatus !== "allow") {
+        finalVerdict = manualStatus;
+      }
+    }
+
+    setScanResult({
+      ...data,
+      verdict: finalVerdict,
+      barcode: currentBarcode,
+      productName: data.productName
+        ? data.productName.replace(/&quot;/g, '"')
+        : data.productName,
+    });
+
+    fetchHistory(user.email);
   } catch (err) {
     if (err.name === "AbortError") {
       console.log("Запит було скасовано користувачем.");
