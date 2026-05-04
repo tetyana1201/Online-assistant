@@ -80,36 +80,37 @@ useEffect(() => {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer group"
-            >
-              <span className="text-xl group-hover:scale-110 transition-transform">
-                📸
-              </span>
-              <span className="text-sm font-bold text-slate-700">Сканер</span>
-            </Link>
+<div className="w-full flex items-center gap-3 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap md:justify-end pb-2 md:pb-0 scrollbar-none select-none">
+  
+  <Link
+    to="/dashboard"
+    className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer group shrink-0"
+  >
+    <span className="text-xl group-hover:scale-110 transition-transform">
+      📸
+    </span>
+    <span className="text-sm font-bold text-slate-700 whitespace-nowrap">Сканер</span>
+  </Link>
 
-            <Link
-              to="/aiassistant"
-              className="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-lg font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2"
-            >
-              <span>✨</span> AI Помічник
-            </Link>
+  <Link
+    to="/aiassistant"
+    className="bg-emerald-500/10 text-emerald-600 px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2 shrink-0"
+  >
+    <span className="whitespace-nowrap">✨ AI Помічник</span>
+  </Link>
 
-            <Link
-              to="/profile"
-              className="flex items-center gap-3 bg-white p-2 pr-6 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer"
-            >
-              <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-200">
-                {user?.email?.charAt(0).toUpperCase() || "U"}
-              </div>
-              <span className="text-sm font-bold text-slate-700">
-                {user?.email || "Користувач"}
-              </span>
-            </Link>
-          </div>
+  <Link
+    to="/profile"
+    className="flex items-center gap-3 bg-white p-2 pr-5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer shrink-0"
+  >
+    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-200 shrink-0">
+      {user?.email?.charAt(0).toUpperCase() || "U"}
+    </div>
+    <span className="text-sm font-bold text-slate-700 whitespace-nowrap">
+      {user?.email || "Користувач"}
+    </span>
+  </Link>
+</div>
         </div>
 
         <div className="w-full max-w-4xl">
