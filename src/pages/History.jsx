@@ -17,14 +17,23 @@ const History = () => {
   };
 
   useEffect(() => {
-    // Якщо після ініціалізації користувача немає — на логін
     if (!user) {
       navigate("/login");
     } else {
-      // Якщо є — завантажуємо історію
       fetchHistory(user.email);
     }
-  }, [navigate, user]); // Додаємо user у залежності
+  }, [navigate, user]); 
+  
+useEffect(() => {
+  if (selectedScan) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, [selectedScan]);
 
   const cleanText = (text) => {
     if (!text) return "";
