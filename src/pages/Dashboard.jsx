@@ -334,8 +334,8 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-12 font-sans selection:bg-emerald-100">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen w-full bg-[#F8FAFC] font-sans selection:bg-emerald-100 overflow-x-hidden">
+      <div className="max-w-6xl mx-auto p-4 md:p-12 w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-4">
           <div>
             <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">
@@ -346,32 +346,32 @@ useEffect(() => {
             </p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="w-full flex items-center gap-3 overflow-x-auto flex-nowrap md:overflow-x-visible md:flex-wrap md:justify-end pb-2 md:pb-0 scrollbar-none select-none">
             <Link
               to="/history"
-              className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer group"
+              className="flex items-center gap-2 bg-white px-5 py-2.5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer group shrink-0"
             >
               <span className="text-xl group-hover:scale-110 transition-transform">
                 🕒
               </span>
-              <span className="text-sm font-bold text-slate-700">Історія</span>
+              <span className="text-sm font-bold text-slate-700 whitespace-nowrap">Історія</span>
             </Link>
 
             <Link
               to="/aiassistant"
-              className="bg-emerald-500/10 text-emerald-600 px-3 py-1 rounded-lg font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2"
+              className="bg-emerald-500/10 text-emerald-600 px-4 py-2.5 rounded-xl font-bold hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-2 shrink-0"
             >
-              <span>✨</span> AI Помічник
+              <span className="whitespace-nowrap">✨ AI Помічник</span>
             </Link>
 
             <Link
               to="/profile"
-              className="flex items-center gap-3 bg-white p-2 pr-6 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer"
+              className="flex items-center gap-3 bg-white p-2 pr-5 rounded-full shadow-sm border border-slate-100 hover:shadow-md hover:bg-slate-50 transition-all cursor-pointer shrink-0"
             >
-              <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-200">
+              <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-emerald-200 shrink-0">
                 {user?.email?.charAt(0).toUpperCase() || "U"}
               </div>
-              <span className="text-sm font-bold text-slate-700">
+              <span className="text-sm font-bold text-slate-700 whitespace-nowrap">
                 {user?.email || "Користувач"}
               </span>
             </Link>

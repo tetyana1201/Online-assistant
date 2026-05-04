@@ -230,7 +230,7 @@ useEffect(() => {
                           {ing.status === "avoid"
                             ? "🔴"
                             : ing.status === "limit"
-                              ? "🟡"
+                              ? "🟠"
                               : "🟢"}
                         </span>
                         <p className="font-black text-xs uppercase tracking-wide">
