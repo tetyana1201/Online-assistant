@@ -430,7 +430,7 @@ useEffect(() => {
             {(isProcessing || (isCameraActive && !previewImage)) && (
   <button
     onClick={() => {
-      const video = document.querySelector("#reader video");
+      const video = document.querySelector(`#${scannerIdRef.current} video`);
       if (video) {
         setIsProcessing(true);
         setOcrStatus("Роблю фото...");
