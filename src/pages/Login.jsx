@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const Login = () => {
@@ -8,6 +8,16 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
   const redirectPath = location.state?.from || "/dashboard";
 
   const handleLogin = async (e) => {
@@ -89,8 +99,8 @@ const Login = () => {
               </label>
               <input
                 type="email"
-                readOnly
-                onFocus={(e) => e.target.removeAttribute("readonly")}
+                readOnly={!isMobile}
+                onFocus={(e) => !isMobile && e.target.removeAttribute("readonly")}
                 autoComplete="username"
                 required
                 value={email}
@@ -109,8 +119,8 @@ const Login = () => {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
-                  readOnly
-                  onFocus={(e) => e.target.removeAttribute("readonly")}
+                  readOnly={!isMobile}
+                  onFocus={(e) => !isMobile && e.target.removeAttribute("readonly")}
                   autoComplete="current-password"
                   required
                   value={password}
