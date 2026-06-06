@@ -70,6 +70,23 @@ const Review = mongoose.model("Review", reviewSchema);
 app.post("/api/register", async (req, res) => {
   try {
     const { email, password, profile } = req.body;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+(?:\.[a-zA-Z]+)*\.[a-zA-Z]{2,}$/;
+    if (!email || !emailRegex.test(email) || email.startsWith("-") || email.includes("-@")) {
+      return res.status(400).json({ message: "Некоректний формат електронної пошти (цифри в домені заборонені)" });
+    }
+
+  if (
+      !password || 
+      password.length < 8 || 
+      !/[A-ZА-ЯІЇЄҐ]/.test(password) || 
+      !/\d/.test(password) || 
+      !/[!@#$%^&*()\-+_=?_./]/.test(password)
+    ) {
+      return res.status(400).json({ 
+        message: "Пароль не відповідає вимогам: мін. 8 символів, 1 велика літера, 1 цифра, 1 спецсимвол" 
+      });
+    }
+
     const userExists = await User.findOne({ email });
     if (userExists)
       return res.status(400).json({ message: "Email вже зайнятий" });
@@ -85,8 +102,9 @@ app.post("/api/register", async (req, res) => {
 
     await newUser.save();
     res.status(201).json({ message: "Користувача створено" });
-  } catch {
-    res.status(500).json({ message: "Помилка реєстрації" });
+  } catch (error) {
+    console.error("Server Register Error:", error);
+    res.status(500).json({ message: "Помилка реєстрації на сервері" });
   }
 });
 

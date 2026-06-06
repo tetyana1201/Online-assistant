@@ -11,9 +11,48 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    
+    let localErrors = {};
+
+    if (!email.trim()) {
+      localErrors.email = "Будь ласка, введіть електронну пошту";
+    }
+    if (!password.trim()) {
+      localErrors.password = "Будь ласка, придумайте пароль";
+    }
+
+    if (Object.keys(localErrors).length > 0) {
+      setErrors(localErrors);
+      return;
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z]+(?:\.[a-zA-Z]+)*\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      localErrors.email = "Некоректний формат пошти";
+    } else if (email.startsWith("-") || email.includes("-@")) {
+      localErrors.email = "Пошта не може починатися або закінчуватися на дефіс";
+    }
+
+    if (password.length < 8) {
+      localErrors.password = "Пароль має містити не менше 8 символів";
+    } else if (!/[A-ZА-ЯІЇЄҐ]/.test(password)) {
+      localErrors.password = "Додайте хоча б одну велику літеру";
+    } else if (!/\d/.test(password)) {
+      localErrors.password = "Додайте хоча б одну цифру";
+    } else if (!/[!@#$%^&*()\-+_=?_./]/.test(password)) {
+      localErrors.password = "Додайте хоча б один спецсимвол";
+    }
+
+    if (Object.keys(localErrors).length > 0) {
+      setErrors(localErrors);
+      return;
+    }
+
+    setErrors({});
     setIsLoading(true);
 
     const finalUserData = {
@@ -39,16 +78,14 @@ const Signup = () => {
           profile: finalUserData.profile,
         };
         localStorage.setItem("user", JSON.stringify(userToStore));
-
         alert("Вітаємо! Ваш профіль збережено.");
-
         navigate("/dashboard");
       } else {
-        alert(data.message || "Помилка реєстрації");
+        setErrors({ server: data.message || "Помилка реєстрації" });
       }
-    } catch (error) {
-      console.error("Помилка зв'язку з сервером:", error);
-      alert("Сервер не відповідає. Перевірте, чи запущений backend.");
+    } catch (err) {
+      console.error("Помилка зв'язку з сервером:", err);
+      setErrors({ server: "Сервер не відповідає. Перевірте backend." });
     } finally {
       setIsLoading(false);
     }
@@ -60,6 +97,7 @@ const Signup = () => {
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-100 rounded-full blur-[120px] opacity-60"></div>
 
       <div className="relative z-10 max-w-4xl w-full grid md:grid-cols-2 bg-white/70 backdrop-blur-2xl rounded-[3.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-white overflow-hidden">
+        
         <div className="p-10 md:p-16 bg-gradient-to-br from-slate-900 to-slate-800 text-white flex flex-col justify-center">
           <div className="mb-8">
             <span className="bg-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
@@ -89,10 +127,7 @@ const Signup = () => {
               </div>
               <div className="flex gap-2 flex-wrap">
                 {surveyData.restrictions?.slice(0, 3).map((res, i) => (
-                  <span
-                    key={i}
-                    className="text-[10px] bg-white/10 px-3 py-1 rounded-lg font-bold"
-                  >
+                  <span key={i} className="text-[10px] bg-white/10 px-3 py-1 rounded-lg font-bold">
                     #{res}
                   </span>
                 ))}
@@ -102,8 +137,9 @@ const Signup = () => {
         </div>
 
         <div className="p-10 md:p-16 bg-white flex flex-col justify-center">
-          <form onSubmit={handleRegister} className="space-y-6">
-            <div className="space-y-2">
+          <form onSubmit={handleRegister} className="space-y-5" noValidate>
+            
+            <div className="space-y-1.5">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-4 tracking-widest">
                 Електронна пошта
               </label>
@@ -113,36 +149,64 @@ const Signup = () => {
                 autoComplete="off"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
+                }}
                 placeholder="example@gmail.com"
-                className="w-full p-5 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-bold text-slate-700 border border-transparent focus:bg-white"
+                className={`w-full p-5 bg-slate-50 rounded-2xl outline-none focus:ring-2 transition-all font-bold text-slate-700 border ${
+                  errors.email ? "border-rose-300 focus:ring-rose-500 bg-rose-50/20" : "border-transparent focus:ring-emerald-500 focus:bg-white"
+                }`}
               />
+              {errors.email && (
+                <p className="text-rose-500 text-[11px] font-bold pl-4 animate-in fade-in duration-200">
+                  ⚠️ {errors.email}
+                </p>
+              )}
             </div>
 
-            <div className="space-y-2 relative">
+            <div className="space-y-1.5 relative">
               <label className="text-[10px] font-black text-slate-400 uppercase ml-4 tracking-widest">
                 Придумайте пароль
               </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                name="registration_password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full p-5 bg-slate-50 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-bold text-slate-700 border border-transparent focus:bg-white"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-5 top-[46px] text-slate-400 hover:text-emerald-500 transition-colors"
-              >
-                {showPassword ? "👁️" : "🙈"}
-              </button>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="registration_password"
+                  autoComplete="new-password"
+                  required
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: "" }));
+                  }}
+                  placeholder="••••••••"
+                  className={`w-full p-5 bg-slate-50 rounded-2xl outline-none focus:ring-2 transition-all font-bold text-slate-700 border ${
+                    errors.password ? "border-rose-300 focus:ring-rose-500 bg-rose-50/20" : "border-transparent focus:ring-emerald-500 focus:bg-white"
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-5 top-[22px] text-slate-400 hover:text-emerald-500 transition-colors"
+                >
+                  {showPassword ? "👁️" : "🙈"}
+                </button>
+              </div>
+              {errors.password && (
+                <p className="text-rose-500 text-[11px] font-bold pl-4 animate-in fade-in duration-200">
+                  ⚠️ {errors.password}
+                </p>
+              )}
             </div>
 
-            <div className="pt-4">
+            {errors.server && (
+              <div className="text-rose-500 text-xs font-bold px-4 py-2 text-center bg-rose-50/50 rounded-xl animate-in fade-in duration-200">
+                ❌ {errors.server}
+              </div>
+            )}
+
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -156,7 +220,7 @@ const Signup = () => {
             </p>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-slate-50 text-center">
+          <div className="mt-6 pt-6 border-t border-slate-50 text-center">
             <p className="text-sm font-bold text-slate-500">
               Вже маєте акаунт?{" "}
               <button
@@ -168,6 +232,7 @@ const Signup = () => {
             </p>
           </div>
         </div>
+
       </div>
     </div>
   );
