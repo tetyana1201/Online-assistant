@@ -115,7 +115,10 @@ const Profile = () => {
 
     let bmr = 10 * weight + 6.25 * height - 5 * age;
 
-    if (userType === "child") bmr *= 1.25;
+    const parsedAge = parseInt(age);
+    if (parsedAge <= 14) {
+      bmr *= 1.25;
+    }
 
     bmr = gender === "male" ? bmr + 5 : bmr - 161;
 
