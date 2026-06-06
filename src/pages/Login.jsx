@@ -9,6 +9,8 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [errors, setErrors] = useState({});
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768 || /Mobi|Android/i.test(navigator.userAgent));
@@ -22,6 +24,22 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    
+    let localErrors = {};
+
+    if (!email.trim()) {
+      localErrors.email = "Будь ласка, введіть пошту";
+    }
+    if (!password.trim()) {
+      localErrors.password = "Будь ласка, введіть пароль";
+    }
+
+    if (Object.keys(localErrors).length > 0) {
+      setErrors(localErrors);
+      return;
+    }
+
+    setErrors({});
     setIsLoading(true);
 
     try {
@@ -37,10 +55,11 @@ const Login = () => {
         localStorage.setItem("user", JSON.stringify(data.user));
         navigate(redirectPath);
       } else {
-        alert(data.message || "Невірні дані для входу");
+        setErrors({ auth: data.message || "Некоректна пошта або пароль" });
       }
-    } catch {
-      alert("Сервер не відповідає. Перевірте підключення.");
+    } catch (err) {
+      console.error("Login error:", err);
+      setErrors({ auth: "Сервер не відповідає. Перевірте підключення." });
     } finally {
       setIsLoading(false);
     }
@@ -104,10 +123,21 @@ const Login = () => {
                 autoComplete="username"
                 required
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (errors.email) setErrors((prev) => ({ ...prev, email: "" }));
+                  if (errors.auth) setErrors((prev) => ({ ...prev, auth: "" }));
+                }}
                 placeholder="hello@example.com"
-                className="w-full p-5 bg-white rounded-3xl outline-none border border-slate-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all font-bold text-slate-700 shadow-sm"
+                className={`w-full p-5 bg-white rounded-3xl outline-none border transition-all font-bold text-slate-700 shadow-sm ${
+                  errors.email ? "border-rose-300 focus:ring-4 focus:ring-rose-500/5 bg-rose-50/10" : "border-slate-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5"
+                }`}
               />
+              {errors.email && (
+                <p className="text-rose-500 text-[11px] font-bold pl-4 animate-in fade-in duration-200">
+                  ⚠️ {errors.email}
+                </p>
+              )}
             </div>
 
             <div className="group space-y-2 relative">
@@ -124,9 +154,15 @@ const Login = () => {
                   autoComplete="current-password"
                   required
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: "" }));
+                    if (errors.auth) setErrors((prev) => ({ ...prev, auth: "" }));
+                  }}
                   placeholder="••••••••"
-                  className="w-full p-5 bg-white rounded-3xl outline-none border border-slate-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 transition-all font-bold text-slate-700 shadow-sm"
+                  className={`w-full p-5 bg-white rounded-3xl outline-none border transition-all font-bold text-slate-700 shadow-sm ${
+                    errors.password ? "border-rose-300 focus:ring-4 focus:ring-rose-500/5 bg-rose-50/10" : "border-slate-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5"
+                  }`}
                 />
                 <button
                   type="button"
@@ -136,7 +172,19 @@ const Login = () => {
                   {showPassword ? "👁️" : "🙈"}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-rose-500 text-[11px] font-bold pl-4 animate-in fade-in duration-200">
+                  ⚠️ {errors.password}
+                </p>
+              )}
             </div>
+
+            {errors.auth && (
+              <div className="text-rose-500 text-xs font-bold px-4 py-2 text-center bg-rose-50/50 rounded-xl animate-in fade-in duration-200 flex items-center justify-center gap-1.5">
+                <span>⚠️</span>
+                <span>{errors.auth}</span>
+              </div>
+            )}
 
             <div className="pt-4">
               <button

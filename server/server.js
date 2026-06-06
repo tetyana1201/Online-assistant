@@ -111,24 +111,24 @@ app.post("/api/register", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    
     const user = await User.findOne({ email });
-
     if (!user) {
-      return res.status(401).json({ message: "Невірні дані" });
+      return res.status(401).json({ message: "Некоректна пошта або пароль" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-
     if (!isMatch) {
-      return res.status(401).json({ message: "Невірні дані" });
+      return res.status(401).json({ message: "Некоректна пошта або пароль" });
     }
 
     res.json({
       message: "Вхід успішний",
       user: { email: user.email, profile: user.profile },
     });
-  } catch {
-    res.status(500).json({ message: "Помилка сервера" });
+  } catch (error) {
+    console.error("Server Login Error:", error);
+    res.status(500).json({ message: "Помилка сервера при спробі входу" });
   }
 });
 
