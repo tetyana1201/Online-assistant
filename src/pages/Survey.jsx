@@ -744,6 +744,7 @@ const Survey = () => {
               <p className="font-bold text-sm">
                 У вас буде 3 варіанти на вибір:
               </p>
+              <p className="text-xs text-slate-600 font-medium">Натискайте на продукт, щоб змінити статус</p>
 
               <div className="flex justify-around items-center">
                 <div className="flex flex-col items-center gap-2">
