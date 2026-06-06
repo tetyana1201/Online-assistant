@@ -154,7 +154,10 @@ useEffect(() => {
       "Stop Scanning": "Зупинити сканування",
       "Start Scanning": "Почати сканування",
       "Select Camera": "Обери камеру",
-      "Or drop an image to scan": "Або перетягни файл сюди"
+      "Or drop an image to scan": "Або перетягни файл сюди",
+      "NotReadableError: Could not start video source": "Не вдалося запустити джерело відео",
+      "Error getting userMedia, error = OverconstrainedError": "Помилка отримання медіафайлів користувача",
+      "NotAllowedError: Permission denied": "У доступі відмовлено. Будь ласка, змініть налаштування камери в браузері"
     };
 
     const translateScannerUI = () => {
@@ -224,7 +227,7 @@ useEffect(() => {
     clearInterval(interceptInterval); 
     scanner.clear().catch((err) => console.error(err));
   };
-}, [user, previewImage]);
+  }, [user, previewImage]);
 
   const handleScan = async (code, text) => {
   if (!user?.email) return;
@@ -323,7 +326,7 @@ useEffect(() => {
   } finally {
     setIsProcessing(false);
   }
-};
+  };
 
   const getStatusStyles = (status) => {
     switch (status) {
@@ -392,7 +395,7 @@ useEffect(() => {
 
             <div id={scannerIdRef.current} className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
             {previewImage ? (
-  <div className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner flex items-center justify-center relative p-4 animate-in fade-in duration-300">
+    <div className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner flex items-center justify-center relative p-4 animate-in fade-in duration-300">
     <img
       src={previewImage}
       alt="Scan Preview"
@@ -405,9 +408,9 @@ useEffect(() => {
       ✕ Очистити фото
     </button>
   </div>
-) : (
+  ) : (
   <div id={scannerIdRef.current} className="rounded-[2rem] overflow-hidden border-4 border-slate-50 bg-slate-50 mb-8 shadow-inner"></div>
-)}
+  )}
 
             <div className="mb-6">
               <label className="flex items-center justify-center w-full py-4 border-2 border-dashed border-emerald-300 rounded-2xl cursor-pointer hover:bg-emerald-50 transition-all text-emerald-700 font-bold">
@@ -460,7 +463,7 @@ useEffect(() => {
   >
     {isProcessing ? "Аналізую..." : "Сфотографувати та проаналізувати"}
   </button>
-)}
+  )}
           </div>
         </div>
 
@@ -591,65 +594,73 @@ useEffect(() => {
                   );
                 })()}
 
-                <div className="relative z-10">
-                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-300 mb-6 flex items-center gap-4">
-                    Склад продукту{" "}
-                    <div className="h-[1px] flex-1 bg-slate-100"></div>
-                  </h3>
-                  <div className="flex flex-wrap gap-4 text-left">
-                    {scanResult.ingredients?.map((ing, idx) => (
-    <div key={idx} className="group relative">
-      <button
-        onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
-        className={`px-6 py-3 rounded-[1.2rem] border-2 font-black text-xs uppercase transition-all hover:scale-105 active:scale-95 ${getStatusStyles(ing.status)}`}
-      >
-        {ing.name
-          .replace(/^RU:/i, "")
-          .toLowerCase()
-          .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
-      </button>
-
-      {ing.reason && (
-        <div className="hidden group-hover:block absolute bottom-full mb-2 z-[100] left-1/2 -translate-x-1/2 w-max max-w-[260px] p-3 bg-slate-900 text-white text-[11px] font-bold rounded-xl shadow-2xl leading-relaxed pointer-events-none">
-          <p className="text-emerald-400 mb-1 uppercase text-[9px] tracking-widest font-black">
-            Обґрунтування:
-          </p>
-          <div className="whitespace-normal break-words">
-            {ing.reason}
-          </div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
-        </div>
-      )}
-
-{ing.reason && activeTooltip === idx && (
-  <div className="block md:hidden absolute top-full mt-2 z-[200] left-1/2 -translate-x-1/2 w-[calc(100vw-48px)] max-w-[280px] p-4 bg-slate-900 text-white text-[13px] font-medium rounded-2xl shadow-2xl leading-relaxed animate-in fade-in zoom-in-95 duration-200">
-    
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        setActiveTooltip(null);
-      }}
-      className="absolute top-3 right-3 text-slate-400 hover:text-white text-base leading-none p-1 transition-colors cursor-pointer select-none"
-    >
-      ✕
-    </button>
-
-    <p className="text-emerald-400 mb-2 uppercase text-[10px] tracking-widest font-black pr-6">
-      Обґрунтування:
-    </p>
-    
-    <div className="whitespace-normal break-words pr-2 text-slate-200">
-      {ing.reason}
-    </div>
-    
-    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 border-8 border-transparent border-b-slate-900"></div>
-  </div>
-)}
-    </div>
-  ))}
+                <div className="mb-4">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-300 mb-2 flex items-center gap-4">
+                      Склад продукту{" "}
+                      <div className="h-[1px] flex-1 bg-slate-100"></div>
+                    </h3>
+<p className="flex md:hidden text-[11px] font-bold text-slate-400 uppercase tracking-wider items-center gap-1.5 mb-4 bg-slate-50 p-3 rounded-xl w-fit border border-slate-100/50">
+  💡 <span>Натисніть на компонент, щоб дізнатися причину</span>
+</p>
                   </div>
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 md:flex md:flex-wrap gap-3 text-left">
+                    {scanResult.ingredients?.map((ing, idx) => (
+                      <div key={idx} className="group relative w-full md:w-auto">
+                        <button
+                          onClick={() => setActiveTooltip(activeTooltip === idx ? null : idx)}
+                          className={`w-full md:w-auto px-5 py-4 md:py-3 rounded-2xl md:rounded-[1.2rem] border-2 font-black text-xs uppercase transition-all hover:scale-[1.01] md:hover:scale-105 active:scale-95 flex items-center justify-between md:justify-center gap-3 ${getStatusStyles(ing.status)}`}
+                        >
+                          <span className="text-left flex-1 pr-2">
+                            {ing.name
+                              .replace(/^RU:/i, "")
+                              .toLowerCase()
+                              .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase())}
+                          </span>
+                          
+                          {ing.reason && (
+                            <span className="md:hidden text-base opacity-70 transition-transform group-hover:translate-x-0.5">
+                              {activeTooltip === idx ? "🔽" : "➔"}
+                            </span>
+                          )}
+                        </button>
+
+                        {ing.reason && (
+                          <div className="hidden md:group-hover:block absolute bottom-full mb-2 z-[100] left-1/2 -translate-x-1/2 w-max max-w-[260px] p-3 bg-slate-900 text-white text-[11px] font-bold rounded-xl shadow-2xl leading-relaxed pointer-events-none">
+                            <p className="text-emerald-400 mb-1 uppercase text-[9px] tracking-widest font-black">
+                              Обґрунтування:
+                            </p>
+                            <div className="whitespace-normal break-words">
+                              {ing.reason}
+                            </div>
+                            <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-slate-900"></div>
+                          </div>
+                        )}
+
+                        {ing.reason && activeTooltip === idx && (
+                          <div className="block md:hidden mt-2 z-[200] w-full p-4 bg-slate-900 text-white text-[13px] font-medium rounded-2xl shadow-xl leading-relaxed animate-in fade-in slide-in-from-top-2 duration-200 relative">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveTooltip(null);
+                              }}
+                              className="absolute top-3 right-3 text-slate-400 hover:text-white text-sm leading-none p-1"
+                            >
+                              ✕
+                            </button>
+
+                            <p className="text-emerald-400 mb-1.5 uppercase text-[10px] tracking-widest font-black pr-6">
+                              Обґрунтування:
+                            </p>
+                            
+                            <div className="whitespace-normal break-words pr-2 text-slate-200">
+                              {ing.reason}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  </div>
             )}
           </div>
         )}
