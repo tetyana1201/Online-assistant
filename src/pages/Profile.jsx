@@ -116,7 +116,7 @@ const Profile = () => {
     let bmr = 10 * weight + 6.25 * height - 5 * age;
 
     const parsedAge = parseInt(age);
-    if (parsedAge <= 14) {
+    if (parsedAge <= 18) {
       bmr *= 1.25;
     }
 
